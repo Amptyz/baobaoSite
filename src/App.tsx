@@ -8,8 +8,8 @@ import Main from './modules/main/main'
 export default function App(){
   return (
       <Routes>
-          <Route path='/' element={<Navigate to='/password'/>} />
-          <Route path='/password/*' element={<Main/>} />
+          <Route path='/' element={<Navigate to='/main'/>} />
+          <Route path='/main/*' element={<Main/>} />
       </Routes>
   )
 }

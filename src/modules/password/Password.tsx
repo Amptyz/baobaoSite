@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import './Password.scss'
 import { useDispatch } from 'react-redux';
-import { enterIn } from '~/store/slices/backgroundSlice';
+import { enterIn, leaveOut } from '~/store/slices/backgroundSlice';
 import './juicyButton.scss'
+import gsap from 'gsap';
 function LockButton(){
-
     const dispatch = useDispatch();
     const animateButton = (e:MouseEvent) => {
         e.preventDefault();
@@ -14,18 +14,37 @@ function LockButton(){
             throw Error('动画按钮元素不是一个HTMLELEMENT!');
         }
         e.target.classList.add('animate');
-        setTimeout(()=>{
-            (e.target as HTMLElement).classList.remove('animate');
-        },500);
+        // setTimeout(()=>{
+        //     (e.target as HTMLElement).classList.remove('animate');
+        // },500);
     }
     useEffect(()=>{
         const bubblyButtons = document.getElementsByClassName('bubbly-button');
         for(const button of bubblyButtons){
             (button as HTMLElement).addEventListener('click', animateButton, false);
         }
-    })
+    },[])
     const handleClick = () => {
-        dispatch(enterIn());
+        const onClickTL = gsap.timeline();
+        onClickTL.to('input',{
+            duration: 1,
+            scale: 1.5,
+            opacity: 0,
+            ease: 'power2.out',
+            onComplete: () => {
+                dispatch(enterIn());
+            }
+        })
+        onClickTL.to('.bubbly-button',{
+            duration: 1,
+            opacity: 0,
+            ease: 'power2.out',
+            scale: 0.1,
+            onComplete: () =>{
+                document.querySelector('.bubbly-button')?.remove();
+            }
+        },'<')
+
     }
     return (
         <>
@@ -36,12 +55,14 @@ function LockButton(){
 
 export default function Password(){
     const [showUnlock, setShowUnlock] = useState(false)
+    const dispatch = useDispatch();
     const handleInputChange = (event:React.ChangeEvent<HTMLElement>)=>{
         const inputValue = (event.target as HTMLInputElement).value;
         if(inputValue.toLowerCase()==='baobao'){
-            setShowUnlock(true)
+            setShowUnlock(true);
         }else{
-            setShowUnlock(false)
+            setShowUnlock(false);
+            dispatch(leaveOut());
         }
     }
     return (
